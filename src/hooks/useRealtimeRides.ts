@@ -55,11 +55,16 @@ export const useRealtimeRides = (filters?: {
           ascending: false,
         });
 
-        if (fetchError) throw fetchError;
+        if (fetchError) {
+          console.error("Supabase fetch error:", fetchError);
+          throw fetchError;
+        }
         setRides(data as unknown as RideWithHost[]);
         setError(null);
       } catch (err) {
-        setError(err as Error);
+        console.error("useRealtimeRides error:", err);
+        const errorMessage = err instanceof Error ? err.message : String(err);
+        setError(new Error(`Failed to fetch rides: ${errorMessage}`));
       } finally {
         setLoading(false);
       }

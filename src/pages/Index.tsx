@@ -22,7 +22,7 @@ const Index = () => {
   const { toast } = useToast();
 
   // Use real-time rides hook
-  const { rides, loading } = useRealtimeRides({
+  const { rides, loading, error: ridesError } = useRealtimeRides({
     status: ["open", "full", "locked"],
   });
 
@@ -102,9 +102,6 @@ const Index = () => {
 
       // Update local state
       setUserRides(prev => new Set([...prev, id]));
-
-      // Refetch rides to update seat counts
-      fetchRides();
     } catch (error: any) {
       console.error("Join ride error:", error);
       toast({
@@ -147,6 +144,19 @@ const Index = () => {
       </header>
 
       <main className="max-w-lg mx-auto px-4 sm:px-6 py-4 space-y-3">
+        {/* Error Banner */}
+        {ridesError && (
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="bg-red-50 border border-red-200 rounded-lg p-3 text-red-700 text-sm"
+          >
+            <p className="font-semibold">Connection Error</p>
+            <p className="text-xs mt-1">{ridesError.message}</p>
+            <p className="text-xs mt-2 text-red-600">Please check your Supabase configuration in src/integrations/supabase/client.ts or ensure VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY environment variables are set.</p>
+          </motion.div>
+        )}
+
         {/* Savings Counter Banner */}
         {totalSavings > 0 && (
           <motion.div
